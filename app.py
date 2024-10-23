@@ -1,10 +1,20 @@
 import streamlit as st
 import anthropic
 import os
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# For local development, you can still use dotenv
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+def get_api_key():
+    """Get API key from environment or Streamlit secrets"""
+    try:
+        return st.secrets["ANTHROPIC_API_KEY"]
+    except Exception:
+        return os.getenv("ANTHROPIC_API_KEY")
 
 def load_css():
     with open('styles.css') as f:
@@ -12,7 +22,12 @@ def load_css():
 
 def generate_story(main_character, location, theme, challenges, activities):
     """Generate a story using Anthropic's Claude API"""
-    client = anthropic.Client(api_key=os.getenv('ANTHROPIC_API_KEY'))
+    api_key = get_api_key()
+    if not api_key:
+        st.error("No API key found. Please set ANTHROPIC_API_KEY in your environment or Streamlit secrets.")
+        return None
+        
+    client = anthropic.Client(api_key=api_key)
     
     prompt = f"""Please write a cheerful, engaging 10-paragraph children's story (aimed at 5-year-olds) with the following elements:
 
