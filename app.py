@@ -9,6 +9,13 @@ try:
 except ImportError:
     pass
 
+# Must be the first Streamlit command
+st.set_page_config(
+    page_title="Story Generator",
+    page_icon="📖",
+    layout="centered"
+)
+
 def get_api_key():
     """Get API key from environment or Streamlit secrets"""
     try:
@@ -19,6 +26,11 @@ def get_api_key():
 def load_css():
     with open('styles.css') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+def show_progress_bar(step):
+    total_steps = 5
+    progress = (step - 1) / total_steps
+    st.progress(progress, text=f"Step {step} of {total_steps}")
 
 def generate_story(main_character, location, theme, challenges, activities):
     """Generate a story using Anthropic's Claude API"""
@@ -57,21 +69,9 @@ The story should:
         st.error(f"Error generating story: {str(e)}")
         return None
 
-def show_progress_bar(step):
-    total_steps = 5
-    progress = (step - 1) / total_steps
-    st.progress(progress, text=f"Step {step} of {total_steps}")
-
 def main():
     # Load CSS
     load_css()
-    
-    # Configure page
-    st.set_page_config(
-        page_title="Story Generator",
-        page_icon="📖",
-        layout="centered"
-    )
 
     st.markdown("<h1 style='text-align: center;'>📖 Magic Story Generator</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Create wonderful stories for children!</p>", unsafe_allow_html=True)
